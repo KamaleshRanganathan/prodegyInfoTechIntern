@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            background-color: pink;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        #weather-container {
+            margin-top: 50px;
+        }
+
+        .weather{
+            margin-top: 250px;
+        }
+    </style>
+</head>
+<body>
+    
+    <form id="location-form" class="weather">
+        <h1>Weather App</h1>
+        <label for="location" style="font-size: x-large;">Enter Location:</label>
+        <input type="text" id="location" placeholder="Enter city name" style="padding: 20px;">
+        <button type="submit" style="padding: 10px;">Get Weather</button>
+    </form>
+    <div id="weather-container">
+        <h2>Current Weather</h2>
+        <div id="weather"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('location-form');
+        const weatherContainer = document.getElementById('weather');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const locationInput = document.getElementById('location').value;
+
+            try {
+                const weatherData = await getWeatherData(locationInput);
+                displayWeather(weatherData);
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                weatherContainer.innerHTML = '<p>Failed to fetch weather data. Please try again.</p>';
+            }
+        });
+
+        async function getWeatherData(location) {
+            const apiKey = 'e45f6789ab12cd34ef567890ab123c45'; 
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error('Failed to fetch weather data');
+            }
+            return await response.json();
+        }
+
+        function displayWeather(weatherData) {
+            const { name, main, weather } = weatherData;
+            const temperature = main.temp;
+            const weatherDescription = weather[0].description;
+            weatherContainer.innerHTML = `
+                <p>Location: ${name}</p>
+                <p>Temperature: ${temperature}°C</p>
+                <p>Weather: ${weatherDescription}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
